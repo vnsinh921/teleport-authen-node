@@ -27,6 +27,21 @@
     src: teleport.yaml.j2
     dest: /etc/teleport.yaml
 
+#- name: Enable server teleport start on boot
+#  systemd:
+#    name: teleport
+#    enabled: yes
+#    masked: no
+
+- name: Copy file systemd teleport.service
+  copy: 
+    src: "teleport.service"
+    dest: /lib/systemd/system/teleport.service
+
+- name: Reload daemon systemd
+  systemd:
+    daemon_reload: yes
+
 - name: Restart service Teleport
   service:
     name: teleport

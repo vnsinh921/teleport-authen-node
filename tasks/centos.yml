@@ -21,6 +21,7 @@
   copy: 
     src: "teleport.service"
     dest: /lib/systemd/system/teleport.service
+
 - name: Reload daemon systemd
   systemd:
     daemon_reload: yes
