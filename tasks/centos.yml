@@ -1,0 +1,43 @@
+# Install teleport on Ubuntu
+
+- name: Yum add-repo teleport
+  shell: yum-config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo
+
+- name: Install teleport package
+  yum:
+    name: teleport
+    state: latest
+
+- name: Add config teleport
+  template:
+    src: teleport.yaml.j2
+    dest: /etc/teleport.yaml
+- name: Enable server teleport start on boot
+  systemd:
+    name: teleport
+    enabled: yes
+    masked: no
+- name: Copy file systemd teleport.service
+  copy: 
+    src: "teleport.service"
+    dest: /lib/systemd/system/teleport.service
+- name: Reload daemon systemd
+  systemd:
+    daemon_reload: yes
+- name: Restart service Teleport
+  service:
+    name: teleport
+    state: restarted
+
+- name: Copy roles template to server
+  copy:
+    src: "{{ item }}"
+    dest: /tmp/
+  with_items: 
+    - admin_role.yaml
+    - user_role.yaml
+
+- name: Create roles teleport
+  shell: |
+    /usr/local/bin/tctl create -f /tmp/admin_role.yaml
+    /usr/local/bin/tctl create -f /tmp/user_role.yaml
